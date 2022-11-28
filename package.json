@@ -109,12 +109,28 @@
     }
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@mantine/core": "^5.8.3",
+    "@mantine/dates": "^5.8.3",
+    "@mantine/form": "^5.8.3",
+    "@mantine/hooks": "^5.8.3",
+    "@mantine/modals": "^5.8.3",
+    "@mantine/notifications": "^5.8.3",
+    "@mantine/spotlight": "^5.8.3",
+    "@tabler/icons": "^1.113.0",
+    "@types/hummus-recipe": "^1.8.5",
+    "@types/pouchdb": "^6.4.0",
+    "@types/sharp": "^0.31.0",
+    "dayjs": "^1.11.6",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.3",
+    "framer-motion": "^7.6.12",
+    "pdf-lib": "^1.17.1",
+    "pouchdb": "^7.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.4.3"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
@@ -240,7 +256,8 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./res/**"
     ],
     "publish": {
       "provider": "github",

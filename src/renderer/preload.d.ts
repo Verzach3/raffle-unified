@@ -12,6 +12,12 @@ declare global {
         once(channel: Channels, func: (...args: unknown[]) => void): void;
       };
     };
+    sharp: {
+      test: () => void;
+    };
+    printApi: {
+      test: () => void;
+    };
   }
 }
 

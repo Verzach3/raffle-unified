@@ -21,3 +21,13 @@ contextBridge.exposeInMainWorld('electron', {
     },
   },
 });
+
+contextBridge.exposeInMainWorld('sharp', {
+  test: () => ipcRenderer.invoke('sharp:test'),
+});
+
+contextBridge.exposeInMainWorld('printApi', {
+  test: () => ipcRenderer.invoke('print:test'),
+  onUpdate: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("print:progress", callback),
+});
+

@@ -1,50 +1,29 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import { MantineProvider } from "@mantine/core"
+import { NotificationsProvider } from '@mantine/notifications';
+import { createBrowserRouter, createHashRouter, RouterProvider } from "react-router-dom";
+import AppShell from "./screens/AppShell";
+import Clients from "./screens/Clients";
+import MainScreen from "./screens/MainScreen";
+import Settings from "./screens/Settings";
 
-const Hello = () => {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-};
+const router = createHashRouter([
+  {
+    path: '/',
+    element: <AppShell />,
+    children: [
+      { path: '/', element: <MainScreen /> },
+      { path: '/clients', element: <Clients /> },
+      { path: '/settings', element: <Settings /> },
+    ],
+  }
+])
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <MantineProvider withNormalizeCSS withGlobalStyles>
+      <NotificationsProvider>
+        <RouterProvider router={router} />
+      </NotificationsProvider>
+    </MantineProvider>
   );
 }
