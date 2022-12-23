@@ -1,6 +1,5 @@
-export type Client = {
+export interface Client {
+  id: string;
   name: string;
-  asignedNumbers: string[];
-  _id: string;
-  _rev: string;
-}
+  numbers: { list: string; numbers: string[] }[];
+};

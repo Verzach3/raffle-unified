@@ -9,7 +9,7 @@
    style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
    viewBox="0 0 8000 5080"
    id="svg2523"
-   sodipodi:docname="template-v2.svg"
+   sodipodi:docname="template.svg"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -30,11 +30,11 @@
    inkscape:cx="151.1811"
    inkscape:cy="120.695"
    inkscape:window-width="1920"
-   inkscape:window-height="1017"
+   inkscape:window-height="1009"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
    inkscape:window-maximized="1"
-   inkscape:current-layer="Capa_x0020_1" />
+   inkscape:current-layer="g1542" />
    <defs
    id="defs2105">
       <font
@@ -6095,15 +6095,18 @@
          </g>
       </g>
       <g
-   id="_3194339542016">
+   id="_3194339542016"
+   transform="translate(687.9167)">
          <g
-   transform="matrix(1.08661 0 0 1 357.56 394.61)"
+   transform="matrix(1.08661,0,0,1,357.56,394.61)"
    id="g2437">
-            <text
-   x="4000"
-   y="2540"
-   class="fil2 fnt3"
-   id="text2435">{{lottery}}</text>
+            <g
+   id="g1542"><text
+     x="4771.8359"
+     y="2540"
+     class="fil2 fnt3"
+     id="text2435"
+     style="font-size:406.11180271px;text-align:center;text-anchor:middle">{{lottery}}</text></g>
          </g>
       </g>
       <g

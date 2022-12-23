@@ -1,84 +1,111 @@
-import PouchDB from 'pouchdb';
 import { Client } from 'types/Client';
+// @ts-ignore
+const { LocalStorage } = await import('lowdb/browser');
+// @ts-ignore
+const { LowSync } = await import('lowdb');
+// @ts-ignore
+const { nanoid } = await import('nanoid');
+type Data = {
+  clients: Client[];
+  numbers: { list: string; numbers: string[] }[];
+};
 
-const clientsDB = new PouchDB<Client>('clients');
+const db = new LowSync<Data>(new LocalStorage('clients-db'));
+db.read();
+db.data ||= { clients: [], numbers: [] };
 
-export function addClient(client: Omit<Client, "_id" | "_rev">): Promise<PouchDB.Core.Response> {
-  try {
-    return clientsDB.put<Client>(client as Client);
-  } catch (error) {
-    throw new Error("Error adding client");
+if (window.db === undefined)
+  window.db = {
+    initDB: () => {
+      console.log('DB Inicializada');
+    },
+    addClient: addClient,
+
+    getClients: () => {
+      return db.data?.clients || [];
+    },
+
+    createList: createList,
+    getLists: getLists,
+    getList: getList,
+    getListKeys: getListKeys,
+    removeList: removeList,
+    asignNumbersToClient: asignNumbersToClient,
+  };
+
+function addClient (client: Client) {
+  // check if the user already exists
+  if (db.data?.clients?.find((c) => c.name === client.name)) {
+    throw new Error('El cliente ya existe');
   }
+  if (!db.data) db.data = { clients: [], numbers: [] };
+  client.id = nanoid();
+  db.data.clients.push(client);
+  db.write();
 }
 
-export async function getClients(): Promise<PouchDB.Core.AllDocsResponse<Client>> {
-  try {
-    return await clientsDB.allDocs({ include_docs: true });
-  } catch (error) {
-    throw error;
-  }
+function getClient(id: string) {
+  return db.data?.clients?.find((c) => c.id === id);
 }
 
-export async function getClient(id: string): Promise<Client> {
-  try {
-    return await clientsDB.get(id);
-  } catch (error) {
-    throw new Error("Couldn't get client");
-  }
-}
-
-export async function updateClient(client: Omit<Client, "_rev">): Promise<PouchDB.Core.Response> {
-  if (client._id === undefined) {
-    throw new Error("Client must have an id");
-  }
-  try {
-    const prevClient = await getClient(client._id);
-    return await clientsDB.put({ ...client, _rev: prevClient._rev });
-  } catch (error) {
-    throw new Error("Client not found");
-  }
-}
-
-export async function deleteClient(client: Client): Promise<PouchDB.Core.Response> {
-  if (client._id === undefined) {
-    throw new Error("Client must have an id");
-  }
-  if (client._rev === undefined) {
-    throw new Error("Client must have a revision");
-  }
-  try {
-    const currClient = await getClient(client._id);
-    return clientsDB.remove(currClient);
-  } catch (error) {
-    throw new Error("Client not found");
-  }
-}
-
-export async function clearClients(): Promise<void> {
-  try {
-    const clients = await getClients();
-    clients.rows.forEach(async (client) => {
-      await deleteClient(client.doc!);
-    });
-  } catch (error) {
-    throw new Error("Couldn't clear clients");
-  }
-}
-
-export async function NUKE_CLIENTS_DB(): Promise<void> {
-  try {
-    await clientsDB.destroy();
-  } catch (error) {
-    console.error("Couldn't destroy clients db");
-    console.warn("Trying hard destroy");
-    try {
-      indexedDB.databases().then((dbs) => {
-        dbs.forEach((db) => {
-          indexedDB.deleteDatabase(db.name!);
-        });
-      })
-    } catch (error) {
-      console.error("Couldn't hard destroy clients db");
+function deleteClient(id: string) {
+  // before deleting the client, we need to remove the numbers from the list and reassign them to numbers
+  const client = getClient(id);
+  if (client === undefined) return;
+  client.numbers.forEach(
+    (list: { list: string; numbers: ConcatArray<string> }) => {
+      const listData = getList(list.list);
+      if (listData === undefined) return;
+      listData.numbers = listData.numbers.concat(list.numbers);
     }
+  );
+  if (db.data === null) return;
+  db.data.clients = db.data.clients.filter((c) => c.id !== id);
+  db.write();
+}
+
+function editClient(client: Client) {
+  deleteClient(client.id);
+  addClient(client);
+}
+
+function createList(name: string) {
+  // fail if list already exists
+  if (getList(name) !== undefined) {
+    throw new Error('la lista ya existe');
   }
+  if (db.data === null) return;
+  // numbers is an array of numbers from 0 to 999
+  const numbers = Array.from(Array(1000).keys()).map((n) => n.toString());
+  db.data!.numbers.push({ list: name, numbers });
+  db.write();
+}
+
+function getLists() {
+  return db.data?.numbers || [];
+}
+
+function getList(name: string) {
+  return getLists().find((list) => list.list === name);
+}
+
+function getListKeys() {
+  return getLists().map((list) => list.list);
+}
+
+function removeList(name: string) {
+  if (db.data === null) return;
+  db.data.numbers = db.data.numbers.filter((list) => list.list !== name);
+  db.write();
+}
+
+function asignNumbersToClient(client: Client, numbers: string[], list: string) {
+  // Assign numbers to client
+  client.numbers = [{ list, numbers }];
+  // Remove numbers from list
+  const listData = getList(list);
+  if (listData === undefined) return;
+  listData.numbers = listData.numbers.filter((n) => !numbers.includes(n));
+  db.write();
+  editClient(client);
 }

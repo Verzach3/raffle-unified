@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
+import "./db/ClientsDB"
 import App from './App';
-
+window.db.initDB();
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 root.render(<App />);

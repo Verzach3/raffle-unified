@@ -15,7 +15,7 @@
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
   },
   "dependencies": {
-    "hummus-recipe": "^2.0.1",
+    "muhammara": "^3.4.0",
     "sharp": "^0.31.2"
   }
 }

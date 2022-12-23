@@ -39,6 +39,9 @@ if (
 }
 
 const configuration: webpack.Configuration = {
+  experiments: {
+    topLevelAwait: true,
+  },
   devtool: 'inline-source-map',
 
   mode: 'development',

@@ -1,19 +1,22 @@
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
 import { mkdirSync, readFileSync } from 'fs';
+import { createWriter } from 'muhammara';
 import { copyFile, readdir, rename, rm } from 'fs/promises';
 import path from 'path';
 import { cwd } from 'process';
+// @ts-ignore
 import sharp from 'sharp';
 import { Client } from 'types/Client';
 import { createRaffle } from '../templateUtil';
 import { Day } from '../types/Day';
 import RaffleData from '../types/RaffleData';
-import HummusRecipe from 'hummus-recipe';
 import { PageSizes } from 'pdf-lib/cjs/api';
 export const generatedPath = path.join(
   app.getPath('documents'),
   '/RaffleManager/Generated'
 );
+
+// Changes directory to the resources folder if the app is packaged
 const resPath = path.join(
   cwd(),
   `${app.isPackaged ? '/resources/' : ''}`,
@@ -37,13 +40,17 @@ export async function printDay(day: Day) {
     price,
     encerradoValue,
     clients,
+    list,
     line1Info,
     line2Info,
     line3Info,
   } = day;
 
   const raffleData = clients.map((client: Client) => {
-    return client.asignedNumbers.map((number: string) => {
+    const asignedNumbers = client.numbers.filter(
+      (asignedNumber) => asignedNumber.list === list
+    )[0];
+    return asignedNumbers.numbers.map((number: string) => {
       return {
         clientName: client.name,
         date,
@@ -159,9 +166,11 @@ export async function makePDF(pagesPath: string) {
       .png()
       .toFile(path.join(pagesPath, `${file}.png`));
   }
-  const pdfDoc = new HummusRecipe('new', path.join(pagesPath, 'raffles.pdf'), {
-    author: 'Raffle Manager',
-  });
+  // const pdfDoc = new HummusRecipe('new', path.join(pagesPath, 'raffles.pdf'), {
+  //   author: 'Raffle Manager',
+  // });
+
+  const pdfDoc = createWriter(path.join(pagesPath, 'raffles.pdf'));
 
   const filesPNG = (await readdir(pagesPath)).filter((file) =>
     file.endsWith('.png')
@@ -170,14 +179,22 @@ export async function makePDF(pagesPath: string) {
     console.log('🚀 ~ makePDF ~ file', file);
   });
   for await (const file of filesPNG) {
+    const page = pdfDoc.createPage(
+      0,
+      0,
+      PageSizes.Legal[0],
+      PageSizes.Legal[1]
+    );
     pdfDoc
-      .createPage(PageSizes.Legal[0], PageSizes.Legal[1])
-      .image(path.join(pagesPath, file), 0, 0, {
-        width: PageSizes.Legal[0],
-        height: PageSizes.Legal[1],
-      })
-      .endPage();
+      .startPageContentContext(page)
+      .drawImage(0, 0, path.join(pagesPath, file), {
+        transformation: {
+          width: PageSizes.Legal[0],
+          height: PageSizes.Legal[1],
+        },
+      });
+    pdfDoc.writePage(page);
   }
 
-  pdfDoc.endPDF();
+  pdfDoc.end();
 }

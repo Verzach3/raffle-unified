@@ -7,67 +7,83 @@ import { printDay } from './printManager';
 const mockClients: Omit<Client, "_id"| "_rev">[] = [
   {
     name: 'Client1',
-    asignedNumbers: ['1', '2', '3'],
+    numbers: ['1', '2', '3'],
+    id: '1',
   },
   {
     name: 'Client2',
-    asignedNumbers: ['4', '5', '6'],
+    numbers: ['4', '5', '6'],
+    id: '2',
   },
   {
     name: 'Client3',
-    asignedNumbers: ['7', '8', '9'],
+    numbers: ['7', '8', '9'],
+    id: '3',
   },
   {
     name: 'Client4',
-    asignedNumbers: ['10', '11', '12'],
+    numbers: ['10', '11', '12'],
+    id: '4',
   },
   {
     name: 'Client5',
-    asignedNumbers: ['13', '14', '15'],
+    numbers: ['13', '14', '15'],
+    id: '5',
   },
   {
     name: 'Client6',
-    asignedNumbers: ['16', '17', '18'],
+    numbers: ['16', '17', '18'],
+    id: '6',
   },
   {
     name: 'Client7',
-    asignedNumbers: ['19', '20', '21'],
+    numbers: ['19', '20', '21'],
+    id: '7',
   },
   {
     name: 'Client8',
-    asignedNumbers: ['22', '23', '24'],
+    numbers: ['22', '23', '24'],
+    id: '8',
   },
   {
     name: 'Client9',
-    asignedNumbers: ['25', '26', '27'],
+    numbers: ['25', '26', '27'],
+    id: '9',
   },
   {
     name: 'Client10',
-    asignedNumbers: ['28', '29', '30'],
+    numbers: ['28', '29', '30'],
+    id: '10',
   },
   {
     name: 'Client11',
-    asignedNumbers: ['31', '32', '33'],
+    numbers: ['31', '32', '33'],
+    id: '11',
   },
   {
     name: 'Client12',
-    asignedNumbers: ['34', '35', '36'],
+    numbers: ['34', '35', '36'],
+    id: '12',
   },
   {
     name: 'Client13',
-    asignedNumbers: ['37', '38', '39'],
+    numbers: ['37', '38', '39'],
+    id: '13',
   },
   {
     name: 'Client14',
-    asignedNumbers: ['40', '41', '42'],
+    numbers: ['40', '41', '42'],
+    id: '14',
   },
   {
     name: 'Client15',
-    asignedNumbers: ['43', '44', '45'],
+    numbers: ['43', '44', '45'],
+    id: '15',
   },
   {
     name: 'Client16',
-    asignedNumbers: ['46', '47', '48'],
+    numbers: ['46', '47', '48'],
+    id: '16',
   },
 ];
 
@@ -75,7 +91,7 @@ const mockDay: Day = {
   date: '2021-01-01',
   prize: 'mercado',
   prizeValue: '200.000',
-  lottery: 'Lotofácil',
+  lottery: 'Loteria Nacional',
   price: '500',
   encerradoValue: '2.000',
   clients: mockClients as Client[],
@@ -96,3 +112,11 @@ ipcMain.handle('print:test', () => {
     console.log('Error: ', error);
   }
 });
+
+ipcMain.handle('print:batch', (event, args) => {
+  try {
+    console.log('args: ', args);
+  } catch (error) {
+    console.log('Error: ', error);
+  }
+})

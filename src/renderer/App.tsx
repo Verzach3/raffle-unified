@@ -4,7 +4,9 @@ import { createBrowserRouter, createHashRouter, RouterProvider } from "react-rou
 import AppShell from "./screens/AppShell";
 import Clients from "./screens/Clients";
 import MainScreen from "./screens/MainScreen";
+import Print from "./screens/Print";
 import Settings from "./screens/Settings";
+import TemplateEditor from "./screens/TemplateEditor";
 
 const router = createHashRouter([
   {
@@ -13,7 +15,9 @@ const router = createHashRouter([
     children: [
       { path: '/', element: <MainScreen /> },
       { path: '/clients', element: <Clients /> },
+      { path: '/print', element: <Print /> },
       { path: '/settings', element: <Settings /> },
+      { path: '/editor', element: <TemplateEditor /> },
     ],
   }
 ])
@@ -21,7 +25,7 @@ const router = createHashRouter([
 export default function App() {
   return (
     <MantineProvider withNormalizeCSS withGlobalStyles>
-      <NotificationsProvider>
+      <NotificationsProvider position="top-right">
         <RouterProvider router={router} />
       </NotificationsProvider>
     </MantineProvider>

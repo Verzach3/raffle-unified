@@ -1,4 +1,5 @@
 import { Channels } from 'main/preload';
+import { Client } from 'types/Client';
 
 declare global {
   interface Window {
@@ -18,6 +19,21 @@ declare global {
     printApi: {
       test: () => void;
     };
+    db: {
+      initDB: () => void;
+      addClient: (client: Client) => void;
+      getClients: () => Client[];
+      createList: (name: string) => void;
+      getLists: () => { list: string; numbers: string[] }[];
+      getList: (name: string) => { list: string; numbers: string[] } | undefined;
+      getListKeys: () => string[];
+      removeList: (name: string) => void;
+      asignNumbersToClient: (
+        client: Client,
+        numbers: string[],
+        list: string
+      ) => void;
+    }
   }
 }
 
