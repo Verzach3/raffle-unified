@@ -17,5 +17,8 @@
   "dependencies": {
     "muhammara": "^3.4.0",
     "sharp": "^0.31.2"
+  },
+  "devDependencies": {
+    "@types/sharp": "^0.31.0"
   }
 }

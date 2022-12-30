@@ -14,26 +14,7 @@ const db = new LowSync<Data>(new LocalStorage('clients-db'));
 db.read();
 db.data ||= { clients: [], numbers: [] };
 
-if (window.db === undefined)
-  window.db = {
-    initDB: () => {
-      console.log('DB Inicializada');
-    },
-    addClient: addClient,
-
-    getClients: () => {
-      return db.data?.clients || [];
-    },
-
-    createList: createList,
-    getLists: getLists,
-    getList: getList,
-    getListKeys: getListKeys,
-    removeList: removeList,
-    asignNumbersToClient: asignNumbersToClient,
-  };
-
-function addClient (client: Client) {
+function addClient(client: Client) {
   // check if the user already exists
   if (db.data?.clients?.find((c) => c.name === client.name)) {
     throw new Error('El cliente ya existe');
@@ -44,29 +25,68 @@ function addClient (client: Client) {
   db.write();
 }
 
-function getClient(id: string) {
-  return db.data?.clients?.find((c) => c.id === id);
+function getClients() {
+  return db.data?.clients || [];
 }
 
+function getClient(id: string) {
+  return db.data?.clients.find((c) => c.id === id);
+}
+function getLists() {
+  return db.data?.numbers || [];
+}
+
+function getList(name: string) {
+  return getLists().find((list) => list.list === name);
+}
 function deleteClient(id: string) {
-  // before deleting the client, we need to remove the numbers from the list and reassign them to numbers
-  const client = getClient(id);
-  if (client === undefined) return;
-  client.numbers.forEach(
-    (list: { list: string; numbers: ConcatArray<string> }) => {
-      const listData = getList(list.list);
-      if (listData === undefined) return;
-      listData.numbers = listData.numbers.concat(list.numbers);
-    }
-  );
-  if (db.data === null) return;
-  db.data.clients = db.data.clients.filter((c) => c.id !== id);
+  // The delete function removes the client and reassigns the numbers to the list
+  const clientData = getClient(id);
+  if (clientData === undefined) return;
+  // remove client
+  db.data!.clients = db.data!.clients.filter((c) => c.id !== id);
+  // reassign numbers
+  clientData.numbers.forEach((list) => {
+    const listData = getList(list.list);
+    if (listData === undefined) return;
+    listData.numbers = listData.numbers.concat(list.numbers);
+    listData.numbers.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+  });
   db.write();
 }
 
-function editClient(client: Client) {
-  deleteClient(client.id);
-  addClient(client);
+function editClient(
+  client: Client,
+  numbersToRemove: string[],
+  numbersToAdd: string[],
+  listName: string
+) {
+  // The edit function removes the numbers from the client and reassigns them to the list, and vice versa
+  const clientData = getClient(client.id);
+  if (clientData === undefined) return;
+  // remove numbers from client
+  clientData.numbers = clientData.numbers.map((list) => {
+    if (list.list === listName) {
+      list.numbers = list.numbers.filter((n) => !numbersToRemove.includes(n));
+    }
+    return list;
+  });
+  // add numbers to client
+  clientData.numbers = clientData.numbers.map((list) => {
+    if (list.list === listName) {
+      list.numbers = list.numbers.concat(numbersToAdd);
+    }
+    return list;
+  });
+  // remove numbers from list
+  const listData = getList(listName);
+  if (listData === undefined) return;
+  listData.numbers = listData.numbers.filter((n) => !numbersToAdd.includes(n));
+  // add numbers to list
+  listData.numbers = listData.numbers.concat(numbersToRemove);
+  // sort numbers
+  listData.numbers.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+  db.write();
 }
 
 function createList(name: string) {
@@ -81,31 +101,36 @@ function createList(name: string) {
   db.write();
 }
 
-function getLists() {
-  return db.data?.numbers || [];
-}
-
-function getList(name: string) {
-  return getLists().find((list) => list.list === name);
-}
-
 function getListKeys() {
   return getLists().map((list) => list.list);
 }
 
 function removeList(name: string) {
-  if (db.data === null) return;
-  db.data.numbers = db.data.numbers.filter((list) => list.list !== name);
+  // The delete function removes the list and deletes the numbers from the clients
+  const listData = getList(name);
+  if (listData === undefined) {
+    throw new Error('la lista no existe');
+  };
+  // remove list
+  db.data!.numbers = db.data!.numbers.filter((list) => list.list !== name);
+  // remove numbers from clients
+  db.data!.clients.forEach((client) => {
+    client.numbers = client.numbers.filter((list) => list.list !== name);
+  });
   db.write();
 }
 
-function asignNumbersToClient(client: Client, numbers: string[], list: string) {
-  // Assign numbers to client
-  client.numbers = [{ list, numbers }];
-  // Remove numbers from list
-  const listData = getList(list);
-  if (listData === undefined) return;
-  listData.numbers = listData.numbers.filter((n) => !numbers.includes(n));
-  db.write();
-  editClient(client);
+if (window.db === undefined) {
+  window.db = {
+    addClient: addClient,
+    getClient: getClient,
+    deleteClient: deleteClient,
+    editClient: editClient,
+    createList: createList,
+    getLists: getLists,
+    getList: getList,
+    getListKeys: getListKeys,
+    removeList: removeList,
+    getClients: getClients,
+  };
 }

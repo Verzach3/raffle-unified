@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   createStyles,
   Table,
@@ -6,10 +6,18 @@ import {
   Group,
   ActionIcon,
   Badge,
+  Modal,
+  Text,
+  TransferList,
+  TransferListData,
+  MultiSelect,
+  Button,
 } from '@mantine/core';
 // @ts-ignore
 import { IconPencil, IconTrash } from '@tabler/icons';
 import { Client } from 'types/Client';
+import { showNotification } from '@mantine/notifications';
+
 const useStyles = createStyles((theme) => ({
   header: {
     position: 'sticky',
@@ -39,45 +47,100 @@ const useStyles = createStyles((theme) => ({
 
 interface TableScrollAreaProps {
   data: Client[];
+  reloadSetter: (reload: boolean) => void;
+  reloadVal: boolean;
+  editEnabled: boolean;
 }
 
-export function ClientsTable({ data }: TableScrollAreaProps) {
+export function ClientsTable({
+  data,
+  reloadSetter,
+  reloadVal,
+  editEnabled
+}: TableScrollAreaProps) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [transferData, setTransferData] = useState<
+    { value: string; label: string }[][]
+  >([[], []]);
+  const [selectedClient, setSelectedClient] = useState<Client>();
+  const [selectedList, setSelectedList] = useState<string>('');
+  const [addSelectValue, setAddSelectValue] = useState<string[]>([]);
+  const [removeSelectValue, setRemoveSelectValue] = useState<string[]>([]);
+  useEffect(() => {
+    if (!isEditModalOpen) return;
+    setTransferData([
+      window.db.getList(selectedList)?.numbers?.map((num) => ({
+        value: num,
+        label: num,
+      })) || [],
+      window.db
+        .getClient(selectedClient?.id || "")
+        ?.numbers.filter((num) => num.list === selectedList)[0]
+        ?.numbers.map((num) => ({
+          value: num,
+          label: num,
+        })) || [],
+    ]);
+    console.log("Selected client: " + selectedClient?.name + " " + window.db.getClient(selectedClient?.id || "")?.name)
+    console.log(addSelectValue, removeSelectValue);
+    return () => {};
+  }, [isEditModalOpen]);
+
   const rows = data.map((row) => (
     <tr key={row.name}>
       <td>{row.name}</td>
       <td>
         <Group>
           {row.numbers.map((list) => (
-            <Badge key={list.list}>{list.list}</Badge>
+            <Badge
+              key={list.list}
+              onClick={() => {
+                setSelectedList(list.list);
+                setSelectedClient(row);
+                console.log("Selected client: " + row.name)
+                setEditModalOpen(true);
+              }}
+            >
+              {list.list}
+            </Badge>
           ))}
         </Group>
       </td>
       <td>
-        <Group>
-          <ActionIcon
-            variant="transparent"
-            color="dark"
-            onClick={() => {
-              console.log(row.name);
-            }}
-          >
-            <IconPencil />
-          </ActionIcon>
           <ActionIcon
             variant="transparent"
             color="red"
             onClick={() => {
-              console.log(row.name);
+              if(editEnabled) {
+                window.db.deleteClient(row.id);
+                reloadSetter(!reloadVal);
+              } else {
+                showNotification({
+                  title: "Error",
+                  message: "No tienes habilitado el modo de edición",
+                  color: "red",
+                })
+              }
             }}
           >
             <IconTrash />
           </ActionIcon>
-        </Group>
       </td>
     </tr>
   ));
+
+  function handleSaveEdit() {
+    if (selectedClient && selectedList.length > 0) {
+      window.db.editClient(selectedClient, removeSelectValue, addSelectValue, selectedList);
+
+      setAddSelectValue([]);
+      setRemoveSelectValue([]);
+      setEditModalOpen(false);
+      reloadSetter(!reloadVal);
+    }
+  }
 
   return (
     <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
@@ -91,6 +154,41 @@ export function ClientsTable({ data }: TableScrollAreaProps) {
         </thead>
         <tbody>{rows}</tbody>
       </Table>
+      <Modal
+        opened={isEditModalOpen}
+        onClose={() => setEditModalOpen((v) => !v)}
+        withCloseButton={false}
+      >
+        <Text fz={'xl'} fw={600}>
+          Editar
+        </Text>
+        <Text fz={'xl'} fw={300}>
+          Lista: {selectedList}
+        </Text>
+        <Text fz={'xl'} fw={300}>
+          Cliente: {selectedClient?.name}
+        </Text>
+        <br />
+        <Text>Añadir</Text>
+        <MultiSelect
+          data={transferData[0]}
+          value={addSelectValue}
+          onChange={(val) => setAddSelectValue(val)}
+          searchable
+          limit={20}
+        />
+        <br />
+        <Text>Quitar</Text>
+        <MultiSelect
+          data={transferData[1]}
+          value={removeSelectValue}
+          onChange={(val) => setRemoveSelectValue(val)}
+          searchable
+          limit={20}
+        />
+        <br />
+        <Button onClick={handleSaveEdit}>Guardar</Button>
+      </Modal>
     </ScrollArea>
   );
 }

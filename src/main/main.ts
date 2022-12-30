@@ -29,6 +29,12 @@ ipcMain.handle('sharp:test', () => {
   return cwd();
 });
 
+ipcMain.handle('preview:generate', async (event, arg) => {
+  const { generatePreview } = require('./previewGenerator');
+  const base64 = await generatePreview(arg);
+  return base64
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

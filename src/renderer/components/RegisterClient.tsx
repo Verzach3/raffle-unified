@@ -13,6 +13,14 @@ function RegisterClient() {
       <Box mx={'lg'}>
         <form
           onSubmit={form.onSubmit((values) => {
+            if (values.name.length < 3){
+              return showNotification({
+                title: 'Error',
+                message: 'El nombre debe tener al menos 3 caracteres',
+                color: 'red',
+              })
+              return
+            }
             try {
               window.db.addClient({
                 id: '',

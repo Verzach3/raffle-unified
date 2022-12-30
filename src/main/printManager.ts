@@ -11,6 +11,7 @@ import { createRaffle } from '../templateUtil';
 import { Day } from '../types/Day';
 import RaffleData from '../types/RaffleData';
 import { PageSizes } from 'pdf-lib/cjs/api';
+
 export const generatedPath = path.join(
   app.getPath('documents'),
   '/RaffleManager/Generated'
@@ -25,6 +26,7 @@ const resPath = path.join(
 const raffleTemplatePath = path.join(resPath, 'template.svg');
 const rafflePosTemplatePath = path.join(resPath, 'image-pos-nocustom.svg');
 const cachedRaffleTemplate = readFileSync(raffleTemplatePath, 'utf8');
+
 export async function printDay(day: Day) {
   try {
     mkdirSync(generatedPath, { recursive: true });
@@ -43,7 +45,7 @@ export async function printDay(day: Day) {
     list,
     line1Info,
     line2Info,
-    line3Info,
+    line3Info
   } = day;
 
   const raffleData = clients.map((client: Client) => {
@@ -62,7 +64,7 @@ export async function printDay(day: Day) {
         encerradoValue,
         line1Info,
         line2Info,
-        line3Info,
+        line3Info
       };
     });
   });
@@ -101,7 +103,7 @@ export async function printDay(day: Day) {
     // ipcMain.emit("print:progress", { progress: 1, total: raffleDataFlat.length });
     BrowserWindow.getAllWindows()[0].webContents.send('print:progress', {
       progress: 1,
-      total: raffleDataFlat.length,
+      total: raffleDataFlat.length
     });
   }
   await makePages(path.join(generatedPath, date));
@@ -119,7 +121,7 @@ export async function makePages(imagesPath: string) {
     } catch (error) {
       console.log(
         '🚀 ~ makePages ~ error',
-        "Maybe the page already exists, let's continue"
+        'Maybe the page already exists, let\'s continue'
       );
     }
     page.forEach(async (file, index) => {
@@ -128,7 +130,7 @@ export async function makePages(imagesPath: string) {
       } catch (error) {
         console.log(
           '🚀 ~ page.forEach ~ error',
-          "Maybe the page already exists, let's continue"
+          'Maybe the page already exists, let\'s continue'
         );
       }
       const filePath = path.join(imagesPath, file);
@@ -190,8 +192,8 @@ export async function makePDF(pagesPath: string) {
       .drawImage(0, 0, path.join(pagesPath, file), {
         transformation: {
           width: PageSizes.Legal[0],
-          height: PageSizes.Legal[1],
-        },
+          height: PageSizes.Legal[1]
+        }
       });
     pdfDoc.writePage(page);
   }

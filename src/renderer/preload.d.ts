@@ -1,5 +1,6 @@
 import { Channels } from 'main/preload';
 import { Client } from 'types/Client';
+import RaffleData from '../types/RaffleData';
 
 declare global {
   interface Window {
@@ -16,24 +17,26 @@ declare global {
     sharp: {
       test: () => void;
     };
+    previewApi: {
+      generatePreview: (raffle: RaffleData) => Promise<string>;
+    };
     printApi: {
       test: () => void;
     };
     db: {
-      initDB: () => void;
       addClient: (client: Client) => void;
       getClients: () => Client[];
+      getClient: (id: string) => Client | undefined;
+      deleteClient: (id: string) => void;
+      editClient: (client: Client, numbersToRemove: string[], numbersToAdd: string[], list:string) => void;
       createList: (name: string) => void;
       getLists: () => { list: string; numbers: string[] }[];
-      getList: (name: string) => { list: string; numbers: string[] } | undefined;
+      getList: (
+        name: string
+      ) => { list: string; numbers: string[] } | undefined;
       getListKeys: () => string[];
       removeList: (name: string) => void;
-      asignNumbersToClient: (
-        client: Client,
-        numbers: string[],
-        list: string
-      ) => void;
-    }
+    };
   }
 }
 

@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import RaffleData from 'types/RaffleData';
 
 export type Channels = 'ipc-example';
 
@@ -29,5 +30,10 @@ contextBridge.exposeInMainWorld('sharp', {
 contextBridge.exposeInMainWorld('printApi', {
   test: () => ipcRenderer.invoke('print:test'),
   onUpdate: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("print:progress", callback),
+});
+
+contextBridge.exposeInMainWorld('previewApi', {
+  generatePreview: (raffle: RaffleData) =>
+    ipcRenderer.invoke('preview:generate', raffle),
 });
 

@@ -119,4 +119,4 @@ ipcMain.handle('print:batch', (event, args) => {
   } catch (error) {
     console.log('Error: ', error);
   }
-})
+});

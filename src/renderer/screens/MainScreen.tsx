@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function MainScreen() {
-  return (
-    <div>MainScreen</div>
-  )
+  return <div>Impresiones Recientes</div>;
 }
 
-export default MainScreen
+export default MainScreen;
