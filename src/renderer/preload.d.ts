@@ -1,6 +1,7 @@
 import { Channels } from 'main/preload';
 import { Client } from 'types/Client';
 import RaffleData from '../types/RaffleData';
+import { Day } from 'types/Day';
 
 declare global {
   interface Window {
@@ -22,6 +23,8 @@ declare global {
     };
     printApi: {
       test: () => void;
+      print: (raffles: Day[], printRemaining: boolean) => void;
+      getRecentPrints: () => Promise<{ day: string; pdfPath: string }[]>;
     };
     db: {
       addClient: (client: Client) => void;

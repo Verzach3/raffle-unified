@@ -36,6 +36,10 @@ const configuration: webpack.Configuration = {
     },
   },
 
+  experiments: {
+    topLevelAwait: true,
+  },
+
   module: {
     rules: [
       {

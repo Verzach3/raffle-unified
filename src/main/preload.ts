@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { Day } from 'types/Day';
 import RaffleData from 'types/RaffleData';
 
 export type Channels = 'ipc-example';
@@ -29,7 +30,9 @@ contextBridge.exposeInMainWorld('sharp', {
 
 contextBridge.exposeInMainWorld('printApi', {
   test: () => ipcRenderer.invoke('print:test'),
+  print: (days: Day[], printRemaining: boolean) => ipcRenderer.invoke('print:batch', days, printRemaining),
   onUpdate: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("print:progress", callback),
+  getRecentPrints: () => ipcRenderer.invoke('print:recents'),
 });
 
 contextBridge.exposeInMainWorld('previewApi', {

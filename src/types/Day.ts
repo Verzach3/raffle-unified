@@ -8,7 +8,8 @@ export interface Day {
   price: string;
   encerradoValue: string;
   clients: Client[];
-  list: string;
+  listName: string;
+  list?: { list: string; numbers: string[] };
   line1Info: string;
   line2Info: string;
   line3Info: string;

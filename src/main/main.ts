@@ -7,7 +7,7 @@ import log from 'electron-log';
 import { cwd } from 'process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import './printTest';
+import './printHandles';
 
 class AppUpdater {
   constructor() {

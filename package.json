@@ -95,14 +95,14 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@mantine/core": "^5.9.5",
-    "@mantine/dates": "^5.9.5",
+    "@mantine/dates": "^5.10.0",
     "@mantine/form": "^5.9.5",
     "@mantine/hooks": "^5.9.5",
     "@mantine/modals": "^5.9.5",
     "@mantine/notifications": "^5.9.5",
     "@mantine/spotlight": "^5.9.5",
     "@tabler/icons": "^1.117.0",
-    "@types/sharp": "^0.31.0",
+    "@types/sharp": "^0.31.1",
     "dayjs": "^1.11.7",
     "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.1",
@@ -114,13 +114,14 @@
     "lowdb": "^5.0.5",
     "nanoid": "^4.0.0",
     "pdf-lib": "^1.17.1",
+    "piscina": "^3.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.3",
     "react-router-dom": "^6.4.3",
     "rxdb": "^13.15.3",
     "rxjs": "^7.6.0",
-    "sharp": "^0.31.3"
+    "threads": "^1.7.0"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
@@ -178,6 +179,7 @@
     "sass-loader": "^13.0.2",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.5",
+    "threads-plugin": "^1.4.0",
     "ts-jest": "^28.0.8",
     "ts-loader": "^9.3.1",
     "ts-node": "^10.9.1",
@@ -190,8 +192,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Raffle Manager",
+    "appId": "com.verzach3.rafflemanager",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

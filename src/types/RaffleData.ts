@@ -1,5 +1,5 @@
 export default interface RaffleData {
-  clientName: string;
+  clientName: string | undefined;
   date: string;
   prize: string;
   prizeValue: string;
@@ -10,4 +10,5 @@ export default interface RaffleData {
   line1Info: string;
   line2Info: string;
   line3Info: string;
+  raffleName?: string;
 }

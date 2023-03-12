@@ -43,6 +43,10 @@ const configuration: webpack.Configuration = {
     ],
   },
 
+  experiments: {
+    topLevelAwait: true,
+  },
+
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',

@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
 import { mkdirSync, readFileSync } from 'fs';
-import { createWriter } from 'muhammara';
 import { copyFile, readdir, rename, rm } from 'fs/promises';
 import path from 'path';
 import { cwd } from 'process';
@@ -10,8 +9,10 @@ import { Client } from 'types/Client';
 import { createRaffle } from '../templateUtil';
 import { Day } from '../types/Day';
 import RaffleData from '../types/RaffleData';
-import { PageSizes } from 'pdf-lib/cjs/api';
-
+import piscina from "piscina"
+import { createWriter } from "muhammara"
+import { spawn, Worker } from 'threads';
+import { PageSizes } from 'pdf-lib';
 export const generatedPath = path.join(
   app.getPath('documents'),
   '/RaffleManager/Generated'
@@ -27,7 +28,10 @@ const raffleTemplatePath = path.join(resPath, 'template.svg');
 const rafflePosTemplatePath = path.join(resPath, 'image-pos-nocustom.svg');
 const cachedRaffleTemplate = readFileSync(raffleTemplatePath, 'utf8');
 
-export async function printDay(day: Day) {
+export async function printDay(day: Day, printRemaining?: boolean) {
+  if (printRemaining === undefined) {
+    printRemaining = false;
+  }
   try {
     mkdirSync(generatedPath, { recursive: true });
   } catch (error) {
@@ -42,34 +46,57 @@ export async function printDay(day: Day) {
     price,
     encerradoValue,
     clients,
-    list,
+    listName: list,
     line1Info,
     line2Info,
-    line3Info
+    line3Info,
   } = day;
 
-  const raffleData = clients.map((client: Client) => {
+  const raffleData: RaffleData[][]  = clients.map((client: Client) => {
     const asignedNumbers = client.numbers.filter(
       (asignedNumber) => asignedNumber.list === list
     )[0];
     return asignedNumbers.numbers.map((number: string) => {
       return {
         clientName: client.name,
-        date,
-        prize,
-        prizeValue,
-        lottery,
-        price,
+        date: date,
+        prize: prize,
+        prizeValue: prizeValue,
+        lottery: lottery,
+        price: price,
         number,
-        encerradoValue,
-        line1Info,
-        line2Info,
-        line3Info
+        encerradoValue: encerradoValue,
+        line1Info: line1Info,
+        line2Info: line2Info,
+        line3Info: line3Info,
       };
     });
   });
 
   const raffleDataFlat: RaffleData[] = raffleData.flat();
+  if (printRemaining === true) {
+    console.log("Printing remaining numbers")
+    // the remaining numbers are in the list parameter of the day, they are the numbers that are not in the clients list
+    // the idea is to print the remaining numbers the same way as the clients numbers but whitout the client name
+    const remainingNumbers = day.list!.numbers.map((number: string) => {
+      return {
+        clientName: "",
+        date: date,
+        prize: prize,
+        prizeValue: prizeValue,
+        lottery: lottery,
+        price: price,
+        number,
+        encerradoValue: encerradoValue,
+        line1Info: line1Info,
+        line2Info: line2Info,
+        line3Info: line3Info,
+      };
+    }
+    );
+    raffleDataFlat.push(...remainingNumbers);
+  }
+
 
   try {
     await rm(path.join(generatedPath, date), { recursive: true });
@@ -97,22 +124,64 @@ export async function printDay(day: Day) {
         path.join(
           generatedPath,
           date,
-          `${flatRaffle.clientName}-${flatRaffle.number}.png`
+          `${flatRaffle.number}.png`
         )
       );
     // ipcMain.emit("print:progress", { progress: 1, total: raffleDataFlat.length });
     BrowserWindow.getAllWindows()[0].webContents.send('print:progress', {
       progress: 1,
-      total: raffleDataFlat.length
+      total: raffleDataFlat.length,
     });
   }
   await makePages(path.join(generatedPath, date));
+  // const make = await spawn(new Worker("./makePDF.ts"))
+  // const pdf = await make.makePDF(path.join(generatedPath, date))
   await makePDF(path.join(generatedPath, date));
 }
 
+async function makePDF(pagesPath: string ) {
+    const files = (await readdir(pagesPath))
+      .filter((file) => file.includes('page'))
+      .sort();
+    for await (const file of files) {
+      await sharp(path.join(pagesPath, file, 'template.svg'))
+        .resize(3400, 5600)
+        .png()
+        .toFile(path.join(pagesPath, `${file}.png`));
+    }
+
+    const pdfDoc = createWriter(path.join(pagesPath, 'raffles.pdf'));
+
+    const filesPNG = (await readdir(pagesPath)).filter((file) =>
+      file.endsWith('.png')
+    );
+    filesPNG.forEach((file) => {
+      console.log('🚀 ~ makePDF ~ file', file);
+    });
+    for await (const file of filesPNG) {
+      const page = pdfDoc.createPage(
+        0,
+        0,
+        PageSizes.Legal[0],
+        PageSizes.Legal[1]
+      );
+      pdfDoc
+        .startPageContentContext(page)
+        .drawImage(0, 0, path.join(pagesPath, file), {
+          transformation: {
+            width: PageSizes.Legal[0],
+            height: PageSizes.Legal[1],
+          },
+        });
+      pdfDoc.writePage(page);
+    }
+
+    pdfDoc.end();
+  }
+
 export async function makePages(imagesPath: string) {
   const files = await readdir(imagesPath);
-  const pageCount = Math.round(files.length / 18);
+  const pageCount = files.length < 18 ? 1 : Math.round(files.length / 18);
   for (let i = 0; i < pageCount; i += 1) {
     const page = files.slice(i * 18, (i + 1) * 18);
     const pagePath = path.join(imagesPath, `page${i + 1}`);
@@ -121,7 +190,7 @@ export async function makePages(imagesPath: string) {
     } catch (error) {
       console.log(
         '🚀 ~ makePages ~ error',
-        'Maybe the page already exists, let\'s continue'
+        "Maybe the page already exists, let's continue"
       );
     }
     page.forEach(async (file, index) => {
@@ -130,7 +199,7 @@ export async function makePages(imagesPath: string) {
       } catch (error) {
         console.log(
           '🚀 ~ page.forEach ~ error',
-          'Maybe the page already exists, let\'s continue'
+          "Maybe the page already exists, let's continue"
         );
       }
       const filePath = path.join(imagesPath, file);
@@ -158,45 +227,4 @@ export async function makePages(imagesPath: string) {
   }
 }
 
-export async function makePDF(pagesPath: string) {
-  const files = (await readdir(pagesPath)).filter((file) =>
-    file.includes('page')
-  );
-  for await (const file of files) {
-    await sharp(path.join(pagesPath, file, 'template.svg'))
-      .resize(3400, 5600)
-      .png()
-      .toFile(path.join(pagesPath, `${file}.png`));
-  }
-  // const pdfDoc = new HummusRecipe('new', path.join(pagesPath, 'raffles.pdf'), {
-  //   author: 'Raffle Manager',
-  // });
 
-  const pdfDoc = createWriter(path.join(pagesPath, 'raffles.pdf'));
-
-  const filesPNG = (await readdir(pagesPath)).filter((file) =>
-    file.endsWith('.png')
-  );
-  filesPNG.forEach((file) => {
-    console.log('🚀 ~ makePDF ~ file', file);
-  });
-  for await (const file of filesPNG) {
-    const page = pdfDoc.createPage(
-      0,
-      0,
-      PageSizes.Legal[0],
-      PageSizes.Legal[1]
-    );
-    pdfDoc
-      .startPageContentContext(page)
-      .drawImage(0, 0, path.join(pagesPath, file), {
-        transformation: {
-          width: PageSizes.Legal[0],
-          height: PageSizes.Legal[1]
-        }
-      });
-    pdfDoc.writePage(page);
-  }
-
-  pdfDoc.end();
-}
