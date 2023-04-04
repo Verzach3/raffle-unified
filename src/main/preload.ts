@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('printApi', {
   print: (days: Day[], printRemaining: boolean) => ipcRenderer.invoke('print:batch', days, printRemaining),
   onUpdate: (callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => ipcRenderer.on("print:progress", callback),
   getRecentPrints: () => ipcRenderer.invoke('print:recents'),
+  open: (path: string) => ipcRenderer.invoke('print:open', path),
 });
 
 contextBridge.exposeInMainWorld('previewApi', {

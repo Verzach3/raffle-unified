@@ -1,6 +1,7 @@
 import { createWriter } from 'muhammara';
 import { readdir } from 'fs/promises';
 import path from 'path';
+// @ts-ignore
 import sharp from 'sharp';
 import { PageSizes } from 'pdf-lib/cjs/api';
 import { expose } from 'threads';

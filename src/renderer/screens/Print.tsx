@@ -43,14 +43,17 @@ function Print() {
             .getClients()
             .filter(
               (client) =>
-                client.numbers.filter((list) => list.list === listKey).length >
-                0
+                (client.numbers.filter((list) => list.list === listKey).length >
+                0) && client.name.match(/ignorados\.?/gi) === null
             ) ?? [],
         date: dayjs(date).locale('es-mx').format('dddd D [de] MMMM [del] YYYY'),
         encerradoValue: selectedRaffleTemplate.encerradoValue,
         line1Info: selectedRaffleTemplate.line1Info,
         line2Info: selectedRaffleTemplate.line2Info,
         line3Info: selectedRaffleTemplate.line3Info,
+        colors: selectedRaffleTemplate.colors,
+        infoPos: selectedRaffleTemplate.infoPos,
+        posLottery: selectedRaffleTemplate.posLottery,
         listName: listKey,
         list: window.db.getList(listKey) ?? {
           list: '',

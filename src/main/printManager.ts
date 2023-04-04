@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
+import { app, BrowserWindow, ipcMain, ipcRenderer, Notification } from 'electron';
 import { mkdirSync, readFileSync } from 'fs';
 import { copyFile, readdir, rename, rm } from 'fs/promises';
 import path from 'path';
@@ -9,9 +9,7 @@ import { Client } from 'types/Client';
 import { createRaffle } from '../templateUtil';
 import { Day } from '../types/Day';
 import RaffleData from '../types/RaffleData';
-import piscina from "piscina"
 import { createWriter } from "muhammara"
-import { spawn, Worker } from 'threads';
 import { PageSizes } from 'pdf-lib';
 export const generatedPath = path.join(
   app.getPath('documents'),
@@ -50,8 +48,14 @@ export async function printDay(day: Day, printRemaining?: boolean) {
     line1Info,
     line2Info,
     line3Info,
+    colors,
+    infoPos,
+    posLottery,
   } = day;
-
+  new Notification({
+    title: 'Raffle Manager',
+    body: 'Empezando a generacion...',
+  }).show();
   const raffleData: RaffleData[][]  = clients.map((client: Client) => {
     const asignedNumbers = client.numbers.filter(
       (asignedNumber) => asignedNumber.list === list
@@ -69,6 +73,9 @@ export async function printDay(day: Day, printRemaining?: boolean) {
         line1Info: line1Info,
         line2Info: line2Info,
         line3Info: line3Info,
+        colors,
+        infoPos,
+        posLottery,
       };
     });
   });
@@ -91,6 +98,9 @@ export async function printDay(day: Day, printRemaining?: boolean) {
         line1Info: line1Info,
         line2Info: line2Info,
         line3Info: line3Info,
+        colors,
+        infoPos,
+        posLottery,
       };
     }
     );
@@ -104,6 +114,11 @@ export async function printDay(day: Day, printRemaining?: boolean) {
     console.log('No folder to delete');
   }
   let skipFolderCreation = false;
+
+  new Notification({
+    title: 'Raffle Manager',
+    body: 'Empezando a generar imagenes',
+  }).show();
 
   for await (const flatRaffle of raffleDataFlat) {
     if (!skipFolderCreation) {
@@ -136,7 +151,17 @@ export async function printDay(day: Day, printRemaining?: boolean) {
   await makePages(path.join(generatedPath, date));
   // const make = await spawn(new Worker("./makePDF.ts"))
   // const pdf = await make.makePDF(path.join(generatedPath, date))
+  new Notification({
+    title: 'Raffle Manager',
+    body: 'Empezando a generar PDF',
+  }).show();
   await makePDF(path.join(generatedPath, date));
+
+  await cleanUp(path.join(generatedPath, date));
+  new Notification({
+    title: 'Raffle Manager',
+    body: 'Generacion finalizada',
+  }).show();
 }
 
 async function makePDF(pagesPath: string ) {
@@ -177,6 +202,7 @@ async function makePDF(pagesPath: string ) {
     }
 
     pdfDoc.end();
+    await rename(path.join(pagesPath, 'raffles.pdf'), path.join(pagesPath, 'raffles-final.pdf'))
   }
 
 export async function makePages(imagesPath: string) {
@@ -228,3 +254,12 @@ export async function makePages(imagesPath: string) {
 }
 
 
+export async function cleanUp(pagesPath: string) {
+  //Erase all files in the folder except the pdf
+  const files = await readdir(pagesPath);
+  for await (const file of files) {
+    if (!file.endsWith('pdf')) {
+      await rm(path.join(pagesPath, file), { recursive: true });
+    }
+  }
+}

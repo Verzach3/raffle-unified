@@ -1,6 +1,6 @@
 // @ts-ignore
 import { app } from "electron";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { cwd } from "process";
 import sharp from "sharp";
@@ -19,5 +19,8 @@ async function generateBase64Raffle(raffle: Buffer) {
 
 export async function generatePreview(raffleData: RaffleData){
   raffleData.number = raffleData.number.padStart(3, '0');
-  return generateBase64Raffle(Buffer.from(createRaffle(cachedRaffleTemplate, raffleData)))
+  const raffle = createRaffle(cachedRaffleTemplate, raffleData);
+  writeFileSync(path.join(resPath, 'raffle.svg'), raffle);
+  return generateBase64Raffle(Buffer.from(raffle))
+
 }

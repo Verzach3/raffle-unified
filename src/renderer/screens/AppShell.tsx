@@ -36,12 +36,12 @@ function AppShell() {
               label="Clientes"
               to="/clients"
             />
-            <NavButton
+            {/* <NavButton
               icon={<IconSettings />}
               color="red"
               label="Ajustes"
               to="/settings"
-            />
+            /> */}
           </Navbar.Section>
         </Navbar>
       }

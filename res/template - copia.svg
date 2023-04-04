@@ -9,7 +9,7 @@
    style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
    viewBox="0 0 8000 5100"
    id="svg1958"
-   sodipodi:docname="template.svg"
+   sodipodi:docname="template - copia.svg"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    inkscape:export-filename="template.svg"
    inkscape:export-xdpi="96"
@@ -34,7 +34,7 @@
    inkscape:cy="136.93953"
    inkscape:window-width="958"
    inkscape:window-height="1000"
-   inkscape:window-x="953"
+   inkscape:window-x="946"
    inkscape:window-y="0"
    inkscape:window-maximized="0"
    inkscape:current-layer="Capa_x0020_1" />
@@ -4902,13 +4902,13 @@
   <g
    transform="matrix(1.28112 0 0 1 1138.71 862.565)"
    id="g1898"
-   style="fill:#c1c111;fill-opacity:1">
+   style="fill:#111fc1;fill-opacity:1">
    <text
    x="3234.9399"
    y="2550"
    class="fil3 fnt6"
    id="text1896"
-   style="fill:#c1c111;fill-opacity:1">VALOR ${{03}}</text>
+   style="fill:#111fc1;fill-opacity:1">VALOR ${{03}}</text>
   </g>
   <g
    transform="matrix(1.11569 0 0 1 -498.792 1529.68)"

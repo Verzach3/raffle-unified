@@ -43,34 +43,65 @@ export function numberToText(number: string) {
 }
 export function createRaffle(raffle: string, raffleData: RaffleData) {
   const numberText = numberToText(raffleData.number).split(',');
-  const output = raffle
-    .replace(/{{clientName}}/g, raffleData.clientName)
-    .replace(/{{date}}/g, raffleData.date)
-    .replace(/{{prize}}/g, raffleData.prize)
-    .replace(/{{prizeValue}}/g, raffleData.prizeValue)
-    .replace(/{{lottery}}/g, raffleData.lottery)
-    .replace(/{{price}}/g, raffleData.price)
-    .replace(/{{number}}/g, raffleData.number)
-    .replace(/{{encerradoValue}}/g, raffleData.encerradoValue)
-    .replace(/{{line1Info}}/g, raffleData.line1Info)
-    .replace(/{{line2Info}}/g, raffleData.line2Info)
-    .replace(/{{line3Info}}/g, raffleData.line3Info)
+  console.log(raffleData.colors)
+  return raffle
+    .replace(/{{clientName}}/g, raffleData.clientName || "")
+    .replace(/{\{10}}/g, raffleData.date)
+    .replace(/{\{01}}/g, raffleData.prize)
+    .replace(/{\{05}}/g, raffleData.prizeValue)
+    .replace(/{\{02}}/g, raffleData.lottery)
+    .replace(/{\{03}}/g, raffleData.price)
+    .replace(/{\{06}}/g, raffleData.number)
+    .replace(/{\{04}}/g, raffleData.encerradoValue)
+    .replace(/{\{11}}/g, raffleData.line1Info)
+    .replace(/{\{12}}/g, raffleData.line2Info)
+    .replace(/{\{13}}/g, raffleData.line3Info)
     .replace(
-      /{{numberText1}}/g,
+      /{\{07}}/g,
       numberText[0].trim() === 'CUATRO' || numberText[0].trim() === 'NUEVE'
         ? numberText[0]
         : `   ${numberText[0]}`
     )
     .replace(
-      /{{numberText2}}/g,
+      /{\{08}}/g,
       numberText[0].trim() === 'CUATRO' ||
-        numberText[0].trim() === 'NUEVE' ||
-        numberText[0].trim() === 'CERO'
+      numberText[0].trim() === 'NUEVE' ||
+      numberText[0].trim() === 'CERO'
         ? numberText[1]
         : `  ${numberText[1]}`
     )
-    .replace(/{{numberText3}}/g, numberText[2].trim());
-  return output;
+    .replace(/{\{09}}/g, numberText[2].trim())
+    .replace(/{\{info1Pos}}/g, raffleData.infoPos?.line1 ?? "1356")
+    .replace(/{\{info2Pos}}/g, raffleData.infoPos?.line2 ?? "1356")
+    .replace(/{\{info3Pos}}/g, raffleData.infoPos?.line3 ?? "1356")
+    .replace(/{\{posLottery}}/g, raffleData.posLottery ?? "2832")
+    // make another with the following color codes and the following format: replace(/c1c1c1ff/g, raffleData.color?.c1c1c1ff ?? "000000ff")
+    // c1c1c1ff: Asociacion de Sorteos Text
+    // c1c1c2ff: Buga text
+    // c1c1c3ff: Icon circle
+    // c1c1c4ff: Freddy Back
+    // c1c1c5ff: Round - line
+    // c1c1c6ff: ASOSORBU text
+    // c1c1c7ff: Number text
+    // c1c1c8ff: Down Text
+    // c1c1c9ff: prize text
+    // c1c1c10f: Lottery Text
+    // c1c1c11f: Price text
+    // c1c1c12f: Date Text
+    // c1c1c13f: N° Text
+    .replaceAll(/#c1c1c1/g, raffleData.colors?.c1c1c1ff ?? "000000")
+    .replaceAll(/#c1c1c2/g, raffleData.colors?.c1c1c2ff ?? "000000")
+    .replaceAll(/#c1c1c3/g, raffleData.colors?.c1c1c3ff ?? "000000")
+    .replaceAll(/#c1c1c4/g, raffleData.colors?.c1c1c4ff ?? "000000")
+    .replaceAll(/#c1c1c5/g, raffleData.colors?.c1c1c5ff ?? "000000")
+    .replaceAll(/#c1c1c6/g, raffleData.colors?.c1c1c6ff ?? "000000")
+    .replaceAll(/#c1c1c7/g, raffleData.colors?.c1c1c7ff ?? "000000")
+    .replaceAll(/#c1c1c8/g, raffleData.colors?.c1c1c8ff ?? "000000")
+    .replaceAll(/#c1c1c9/g, raffleData.colors?.c1c1c9ff ?? "000000")
+    .replaceAll(/#c1c110/g, raffleData.colors?.c1c1c10f ?? "000000")
+    .replaceAll(/#c1c111/g, raffleData.colors?.c1c1c11f ?? "000000")
+    .replaceAll(/#c1c112/g, raffleData.colors?.c1c1c12f ?? "000000")
+    .replaceAll(/#c1c113/g, raffleData.colors?.c1c1c13f ?? "000000");
 }
 
 export function singleNumberToFullNumber(number: string) {

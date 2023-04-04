@@ -24,7 +24,8 @@ declare global {
     printApi: {
       test: () => void;
       print: (raffles: Day[], printRemaining: boolean) => void;
-      getRecentPrints: () => Promise<{ day: string; pdfPath: string }[]>;
+      getRecentPrints: () => Promise<{ day: string; pdfPath: string; createdAt: number; }[]>;
+      open: (path: string) => void;
     };
     db: {
       addClient: (client: Client) => void;
