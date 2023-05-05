@@ -25,6 +25,15 @@ function addClient(client: Client) {
   db.write();
 }
 
+function getData() {
+  return db.data || {}
+}
+
+function setData(data: any) {
+  db.data = data
+  db.write();
+}
+
 function getClients() {
   return db.data?.clients || [];
 }
@@ -132,5 +141,7 @@ if (window.db === undefined) {
     getListKeys: getListKeys,
     removeList: removeList,
     getClients: getClients,
+    setData: setData,
+    getData: getData
   };
 }

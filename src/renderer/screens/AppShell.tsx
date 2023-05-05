@@ -17,7 +17,7 @@ function AppShell() {
       navbar={
         <Navbar width={{ base: 300 }}>
           <Navbar.Section grow>
-            <NavButton icon={<IconHome />} color="red" label="Main" to="/" />
+            <NavButton icon={<IconHome />} color="red" label="Inicio" to="/" />
             <NavButton
               icon={<IconPrinter />}
               color="red"
@@ -36,12 +36,12 @@ function AppShell() {
               label="Clientes"
               to="/clients"
             />
-            {/* <NavButton
+            <NavButton
               icon={<IconSettings />}
               color="red"
               label="Ajustes"
               to="/settings"
-            /> */}
+            />
           </Navbar.Section>
         </Navbar>
       }

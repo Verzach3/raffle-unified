@@ -11,6 +11,7 @@ export default interface RaffleData {
   line2Info: string;
   line3Info: string;
   raffleName?: string;
+  prizePos?: string;
   infoPos?: {
     line1: string;
     line2: string;

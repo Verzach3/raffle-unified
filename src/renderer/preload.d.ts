@@ -40,6 +40,8 @@ declare global {
       ) => { list: string; numbers: string[] } | undefined;
       getListKeys: () => string[];
       removeList: (name: string) => void;
+      getData: () => any;
+      setData: (data: any) => void;
     };
   }
 }

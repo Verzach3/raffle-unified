@@ -43,10 +43,10 @@ export function numberToText(number: string) {
 }
 export function createRaffle(raffle: string, raffleData: RaffleData) {
   const numberText = numberToText(raffleData.number).split(',');
-  console.log(raffleData.colors)
+  // console.log(raffleData.colors)
   return raffle
     .replace(/{{clientName}}/g, raffleData.clientName || "")
-    .replace(/{\{10}}/g, raffleData.date)
+    .replaceAll(/{\{10}}/g, raffleData.date.toUpperCase())
     .replace(/{\{01}}/g, raffleData.prize)
     .replace(/{\{05}}/g, raffleData.prizeValue)
     .replace(/{\{02}}/g, raffleData.lottery)
@@ -56,6 +56,7 @@ export function createRaffle(raffle: string, raffleData: RaffleData) {
     .replace(/{\{11}}/g, raffleData.line1Info)
     .replace(/{\{12}}/g, raffleData.line2Info)
     .replace(/{\{13}}/g, raffleData.line3Info)
+    .replaceAll(/{\{prizePos}}/g, raffleData.prizePos ?? "2816.78")
     .replace(
       /{\{07}}/g,
       numberText[0].trim() === 'CUATRO' || numberText[0].trim() === 'NUEVE'

@@ -33,9 +33,10 @@ ipcMain.handle('print:test', () => {
 
 ipcMain.handle('print:batch', async (event, days: Day[], printRemaining: boolean) => {
   try {
-    days.forEach((day: Day) => {
-      printDay(day, printRemaining);
-    });
+    for await (const day of days){
+      await printDay(day, printRemaining);
+      console.log(day.date);
+    };
     console.log('args: ', days, printRemaining);
   } catch (error) {
     console.log('Error: ', error);

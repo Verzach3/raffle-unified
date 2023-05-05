@@ -56,6 +56,7 @@ function TemplateEditor() {
   const [color12, setColor12] = useState<string>('000000ff');
   const [color13, setColor13] = useState<string>('000000ff');
   const [posLottery, setPosLottery] = useState<string>('2832');
+  const [prizePos, setPrizePos] = useState<string>('2816.78');
   const [currentColor, setCurrentColor] = useState<string>('c1c1c1ff');
   const [currentSelColor, setCurrentSelColor] = useState<string>('c1c1c1ff');
   const testRaffle: RaffleData = {
@@ -66,6 +67,7 @@ function TemplateEditor() {
     prizeValue: prizeValue,
     lottery: lottery,
     price: price,
+    prizePos: prizePos,
     number: '2',
     encerradoValue: encerradoValue,
     line1Info: line1Info,
@@ -127,6 +129,7 @@ function TemplateEditor() {
     color12,
     color13,
     posLottery,
+    prizePos,
   ]);
 
   function updateColor(color: string, value: string) {
@@ -258,6 +261,16 @@ function TemplateEditor() {
             placeholder="200.000"
             value={prizeValue}
             onChange={(e) => setPrizeValue(e.target.value)}
+          />
+                    <Slider
+            onChangeEnd={(value) => {
+              console.log('end', value);
+              setPrizePos(value.toString());
+            }}
+            value={parseInt(prizePos)}
+            max={5000}
+            defaultValue={2816.78}
+            min={-5000}
           />
           <TextInput
             label="Loteria"
@@ -413,6 +426,7 @@ function TemplateEditor() {
                               setColor11(raffle.colors?.c1c1c11f ?? 'c1c1c11f');
                               setColor12(raffle.colors?.c1c1c12f ?? 'c1c1c12f');
                               setPosLottery(raffle.posLottery ?? '0');
+                              setPrizePos(raffle.prizePos ?? "2816.78")
                             }}
                           >
                             {raffle.raffleName ?? 'Plantilla sin nombre'}

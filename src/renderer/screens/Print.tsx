@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar } from '@mantine/dates';
+import { Calendar, DatePicker } from '@mantine/dates';
 import 'dayjs/locale/es-mx';
 import {
   Button,
@@ -43,8 +43,8 @@ function Print() {
             .getClients()
             .filter(
               (client) =>
-                (client.numbers.filter((list) => list.list === listKey).length >
-                0) && client.name.match(/ignorados\.?/gi) === null
+                client.numbers.filter((list) => list.list === listKey).length >
+                  0 && client.name.match(/ignorados\.?/gi) === null
             ) ?? [],
         date: dayjs(date).locale('es-mx').format('dddd D [de] MMMM [del] YYYY'),
         encerradoValue: selectedRaffleTemplate.encerradoValue,
@@ -63,18 +63,27 @@ function Print() {
         price: selectedRaffleTemplate.price,
         prize: selectedRaffleTemplate.prize,
         prizeValue: selectedRaffleTemplate.prizeValue,
+        prizePos: selectedRaffleTemplate.prizePos
       });
     });
+    // console.log(toPrint[0])
     window.printApi.print(toPrint, printRemaining);
   }
   useEffect(() => {
-    setSelectedDatesText(
-      selectedDates
+    try {
+
+      setSelectedDatesText(
+        selectedDates
         .map((date) =>
-          dayjs(date).locale('es-mx').format('dddd D [de] MMMM [del] YYYY')
+        dayjs(date).locale('es-mx').format('dddd D [de] MMMM [del] YYYY')
         )
         .join(', ')
-    );
+        );
+      }
+      catch(e) {
+        console.log("err", e);
+      }
+    console.log(selectedDates);
     return () => {};
   }, [selectedDates]);
 
@@ -90,10 +99,13 @@ function Print() {
             />
           </Popover.Target>
           <Popover.Dropdown>
-            <Calendar
-              multiple
+            <DatePicker
+              type="multiple"
               value={selectedDates}
               onChange={(val) => {
+                if (!val) {
+                  return
+                }
                 setSelectedDates(val);
                 console.log(val);
               }}

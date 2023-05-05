@@ -23,7 +23,7 @@ const resPath = path.join(
   'res/'
 );
 const raffleTemplatePath = path.join(resPath, 'template.svg');
-const rafflePosTemplatePath = path.join(resPath, 'image-pos-nocustom.svg');
+const rafflePosTemplatePath = path.join(resPath, 'template-pos-16.svg');
 const cachedRaffleTemplate = readFileSync(raffleTemplatePath, 'utf8');
 
 export async function printDay(day: Day, printRemaining?: boolean) {
@@ -51,7 +51,9 @@ export async function printDay(day: Day, printRemaining?: boolean) {
     colors,
     infoPos,
     posLottery,
+    prizePos
   } = day;
+  console.log(prizePos);
   new Notification({
     title: 'Raffle Manager',
     body: 'Empezando a generacion...',
@@ -76,6 +78,7 @@ export async function printDay(day: Day, printRemaining?: boolean) {
         colors,
         infoPos,
         posLottery,
+        prizePos
       };
     });
   });
@@ -86,6 +89,7 @@ export async function printDay(day: Day, printRemaining?: boolean) {
     // the remaining numbers are in the list parameter of the day, they are the numbers that are not in the clients list
     // the idea is to print the remaining numbers the same way as the clients numbers but whitout the client name
     const remainingNumbers = day.list!.numbers.map((number: string) => {
+      console.log(prizePos);
       return {
         clientName: "",
         date: date,
@@ -101,6 +105,7 @@ export async function printDay(day: Day, printRemaining?: boolean) {
         colors,
         infoPos,
         posLottery,
+        prizePos
       };
     }
     );
@@ -157,7 +162,7 @@ export async function printDay(day: Day, printRemaining?: boolean) {
   }).show();
   await makePDF(path.join(generatedPath, date));
 
-  await cleanUp(path.join(generatedPath, date));
+  // await cleanUp(path.join(generatedPath, date));
   new Notification({
     title: 'Raffle Manager',
     body: 'Generacion finalizada',
@@ -207,26 +212,26 @@ async function makePDF(pagesPath: string ) {
 
 export async function makePages(imagesPath: string) {
   const files = await readdir(imagesPath);
-  const pageCount = files.length < 18 ? 1 : Math.round(files.length / 18);
+  const pageCount = files.length < 16 ? 1 : Math.ceil(files.length / 16);
   for (let i = 0; i < pageCount; i += 1) {
-    const page = files.slice(i * 18, (i + 1) * 18);
+    const page = files.slice(i * 16, (i + 1) * 16);
     const pagePath = path.join(imagesPath, `page${i + 1}`);
     try {
       mkdirSync(pagePath);
     } catch (error) {
-      console.log(
-        '🚀 ~ makePages ~ error',
-        "Maybe the page already exists, let's continue"
-      );
+      // console.log(
+      //   '🚀 ~ makePages ~ error',
+      //   "Maybe the page already exists, let's continue"
+      // );
     }
     page.forEach(async (file, index) => {
       try {
         mkdirSync(path.join(pagePath, 'images'));
       } catch (error) {
-        console.log(
-          '🚀 ~ page.forEach ~ error',
-          "Maybe the page already exists, let's continue"
-        );
+        // console.log(
+        //   '🚀 ~ page.forEach ~ error',
+        //   "Maybe the page already exists, let's continue"
+        // );
       }
       const filePath = path.join(imagesPath, file);
       const newFilePath = path.join(

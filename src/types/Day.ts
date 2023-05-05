@@ -31,6 +31,7 @@ export interface Day {
     line3: string;
   };
   posLottery?: string;
+  prizePos?: string;
   line1Info: string;
   line2Info: string;
   line3Info: string;
